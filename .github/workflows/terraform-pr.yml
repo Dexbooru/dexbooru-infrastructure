@@ -12,8 +12,8 @@ permissions:
   contents: read
 
 env:
-  TF_IN_AUTOMATION: true
   AWS_REGION: ${{ vars.AWS_REGION }}
+  TF_IN_AUTOMATION: true
   TF_WORKING_DIR: infrastructure
 
 concurrency:
@@ -58,7 +58,7 @@ jobs:
       - name: Terraform Init
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
-          terraform init -input=false
+          terraform init -input=false -backend-config=backend.tfbackend -reconfigure
 
       - name: Terraform Format Check
         working-directory: ${{ env.TF_WORKING_DIR }}
