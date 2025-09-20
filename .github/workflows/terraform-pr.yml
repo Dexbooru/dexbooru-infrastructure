@@ -1,0 +1,92 @@
+name: terraform-pr
+
+on:
+  pull_request:
+    paths:
+      - "infrastructure/**"
+    branches:
+      - "**"
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: true
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  TF_WORKING_DIR: infrastructure
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: hashicorp/setup-terraform@v3
+
+      - name: Cache Terraform
+        uses: actions/cache@v4
+        with:
+          path: |
+            ${{ env.TF_WORKING_DIR }}/.terraform
+            ~/.terraform.d/plugin-cache
+          key: tf-${{ runner.os }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            tf-${{ runner.os }}-
+
+      - name: Write terraform.tfvars
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          cat > terraform.tfvars <<'EOF'
+          aws_region                          = "us-east-1"
+          profile_picture_bucket_name         = "dexbooru-prd-pfps"
+          post_picture_bucket_name            = "dexbooru-prd-posts"
+          post_collection_picture_bucket_name = "dexbooru-prd-collections"
+          dexbooru_webapp_iam_user_name       = "dexbooru-webapp-iam-user"
+          dexbooru_webapp_policy_name         = "dexbooru-webapp-policy"
+          EOF
+
+      - name: Terraform Init
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init -input=false
+
+      - name: Terraform Format Check
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: terraform plan -input=false -no-color -out=tfplan
+
+      - name: Terraform Show Plan
+        id: tfshowplan
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          DATE=$(date +%Y%m%d)
+          SAFE_TITLE=$(echo "${{ github.event.pull_request.title }}" | tr ' ' '_' | tr -cd '[:alnum:]_')
+          FILENAME="${DATE}_${SAFE_TITLE}.txt"
+          terraform show -no-color tfplan | tee "$FILENAME"
+          echo "filename=$FILENAME" >> $GITHUB_OUTPUT
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-${{ github.sha }}
+          path: |
+            ${{ env.TF_WORKING_DIR }}/tfplan
+            ${{ env.TF_WORKING_DIR }}/${{ steps.tfshowplan.outputs.filename }}
+          retention-days: 7
