@@ -29,29 +29,13 @@ module "build_iam_resources" {
   dexbooru_iam_user_name        = var.dexbooru_webapp_iam_user_name
   dexbooru_iam_user_policy_name = var.dexbooru_webapp_policy_name
 
-  profile_picture_bucket_arn         = module.build_s3_resources.profile_picture_bucket_arn
-  post_picture_bucket_arn            = module.build_s3_resources.post_picture_bucket_arn
-  post_collection_picture_bucket_arn = module.build_s3_resources.post_collection_picture_bucket_arn
+  profile_picture_bucket_arn         = module.build_s3_resources.s3_buckets["profile_pictures"].arn
+  post_picture_bucket_arn            = module.build_s3_resources.s3_buckets["post_pictures"].arn
+  post_collection_picture_bucket_arn = module.build_s3_resources.s3_buckets["collection_pictures"].arn
 }
 
 module "build_cloudfront_resources" {
   source = "./modules/cloudfront"
 
-  s3_origins = {
-    profile_pictures = {
-      id          = module.build_s3_resources.profile_picture_bucket_id
-      domain_name = module.build_s3_resources.profile_picture_bucket_domain_name
-      arn         = module.build_s3_resources.profile_picture_bucket_arn
-    },
-    post_pictures = {
-      id          = module.build_s3_resources.post_picture_bucket_id
-      domain_name = module.build_s3_resources.post_picture_bucket_domain_name
-      arn         = module.build_s3_resources.post_picture_bucket_arn
-    },
-    post_collection_pictures = {
-      id          = module.build_s3_resources.post_collection_picture_bucket_id
-      domain_name = module.build_s3_resources.post_collection_picture_bucket_domain_name
-      arn         = module.build_s3_resources.post_collection_picture_bucket_arn
-    }
-  }
+  s3_origins = module.build_s3_resources.s3_buckets
 }
