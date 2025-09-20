@@ -44,7 +44,7 @@ jobs:
           restore-keys: |
             tf-${{ runner.os }}-
       
-       - name: Write terraform.tfvars
+      - name: Write terraform.tfvars
         working-directory: ${{ env.TF_WORKING_DIR }}
         run: |
           cat > terraform.tfvars <<'EOF'
