@@ -54,7 +54,7 @@ jobs:
           dexbooru_webapp_iam_user_name       = "dexbooru-webapp-iam-user"
           dexbooru_webapp_policy_name         = "dexbooru-webapp-policy"
           cdn_domain                          = "cdn.neetbyte.fun"
-          cdn_zone_name                       = "neetbyte.fun"
+          cdn_zone_name                       = "cdn.neetbyte.fun"
           EOF
 
       - name: Terraform Init
