@@ -7,13 +7,3 @@ variable "s3_origins" {
   }))
   default = {}
 }
-
-variable "certificate_arn" {
-  type        = string
-  description = "ARN of the ACM certificate to use for CloudFront"
-}
-
-variable "domain_name" {
-  type        = string
-  description = "Domain name alias for the CloudFront distribution"
-}

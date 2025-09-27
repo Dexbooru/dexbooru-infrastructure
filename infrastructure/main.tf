@@ -39,7 +39,4 @@ module "build_cloudfront_resources" {
   source = "./modules/cloudfront"
 
   s3_origins = module.build_s3_resources.s3_buckets
-
-  domain_name     = module.build_route53_resources.domain_name
-  certificate_arn = module.build_route53_resources.certificate_arn
 }
