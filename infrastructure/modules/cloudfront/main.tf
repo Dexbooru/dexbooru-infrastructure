@@ -60,11 +60,6 @@ resource "aws_cloudfront_distribution" "cdn" {
     min_ttl                = local.min_ttl
     default_ttl            = local.default_ttl
     max_ttl                = local.max_ttl
-
-    function_association {
-      event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.root_html.arn
-    }
   }
 
   ordered_cache_behavior {
