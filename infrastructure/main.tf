@@ -34,12 +34,6 @@ module "build_iam_resources" {
   post_collection_picture_bucket_arn = module.build_s3_resources.s3_buckets["collection_pictures"].arn
 }
 
-module "build_route53_resources" {
-  source = "./modules/route53"
-
-  domain_name = var.cdn_domain
-  zone_name   = var.cdn_zone_name
-}
 
 module "build_cloudfront_resources" {
   source = "./modules/cloudfront"
