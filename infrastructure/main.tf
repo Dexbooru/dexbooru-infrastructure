@@ -32,6 +32,8 @@ module "build_iam_resources" {
   profile_picture_bucket_arn         = module.build_s3_resources.s3_buckets["profile_pictures"].arn
   post_picture_bucket_arn            = module.build_s3_resources.s3_buckets["post_pictures"].arn
   post_collection_picture_bucket_arn = module.build_s3_resources.s3_buckets["collection_pictures"].arn
+
+  depends_on = [module.build_s3_resources]
 }
 
 
@@ -39,4 +41,6 @@ module "build_cloudfront_resources" {
   source = "./modules/cloudfront"
 
   s3_origins = module.build_s3_resources.s3_buckets
+
+  depends_on = [module.build_s3_resources]
 }
