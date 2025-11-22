@@ -29,3 +29,28 @@ variable "dexbooru_webapp_policy_name" {
   type        = string
   description = "The policy "
 }
+
+variable "post_images_anime_series_classificarion_queue_name" {
+  description = "The name of the SQS queue for post images anime series classification."
+  type        = string
+}
+
+variable "post_images_anime_series_classifier_lambda_function_name" {
+  description = "The name of the Lambda function for post images anime series classification."
+  type        = string
+}
+
+variable "gemini_api_key" {
+  type        = string
+  description = "The API key for the Gemini API"
+}
+
+variable "anime_series_classifier_webhook_url" {
+  description = "The URL of the webhook to send classification results to in the web application"
+  type        = string
+}
+
+variable "webhook_secret" {
+  description = "The secret for the webhook"
+  type        = string
+}
