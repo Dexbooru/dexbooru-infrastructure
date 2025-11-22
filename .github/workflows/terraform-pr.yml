@@ -53,6 +53,11 @@ jobs:
           post_collection_picture_bucket_name = "dexbooru-prd-collections"
           dexbooru_webapp_iam_user_name       = "dexbooru-webapp-iam-user"
           dexbooru_webapp_policy_name         = "dexbooru-webapp-policy"
+          post_images_anime_series_classificarion_queue_name       = "dexbooru-prd-post-anime-series-classification-queue"
+          post_images_anime_series_classifier_lambda_function_name = "dexbooru-prd-post-anime-series-classifier-lambda"
+          gemini_api_key = "${{ secrets.GEMINI_API_KEY }}"
+          webhook_secret = "${{ secrets.WEBHOOK_SECRET }}"
+          anime_series_classifier_webhook_url = "https://dexbooru.neetbyte.fun/webhooks/classify-posts"
           EOF
 
       - name: Terraform Init

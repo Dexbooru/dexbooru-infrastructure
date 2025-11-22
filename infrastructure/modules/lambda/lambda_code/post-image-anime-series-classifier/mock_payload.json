@@ -1,0 +1,52 @@
+{
+  "Records": [
+    {
+      "messageId": "c1d2e3f4-5678-90ab-cdef-123456789012",
+      "receiptHandle": "AQEBwJnKyrilWSTu5tl4KkYdMEQ9tVvXh22JgWq28S2tXJzCjNfHFTf1/rY02iU/sgDfoOQ/T8eWc...",
+      "body": "{\"postId\":\"b0887ae4-82e7-4a73-bdf3-0e5814e9a145\",\"imageUrl\":\"https://dl4c99ffyp7xu.cloudfront.net/posts/086405aa-66dd-45e4-abe5-fe85e0708416_original\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1678886402000",
+        "SenderId": "AIDAIYIWI24FAD3TGYIHM",
+        "ApproximateFirstReceiveTimestamp": "1678886402000"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "0e50f584f23e7f42c26c11739c381c8d",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:MyImageQueue",
+      "awsRegion": "us-east-1"
+    },
+    {
+      "messageId": "d1e2f3g4-5678-90ab-cdef-234567890123",
+      "receiptHandle": "AQEBwJnKyrilWSTu5tl4KkYdMEQ9tVvXh22JgWq28S2tXJzCjNfHFTf1/rY02iU/sgDfoOQ/T8eWc...",
+      "body": "{\"postId\":\"b0718c72-e479-4a0c-85e1-78b3338eeb3a\",\"imageUrl\":\"https://dl4c99ffyp7xu.cloudfront.net/posts/8b839f33-fdeb-423f-9313-c4350da63c59_original\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1678886403000",
+        "SenderId": "AIDAIYIWI24FAD3TGYIHM",
+        "ApproximateFirstReceiveTimestamp": "1678886403000"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "0e50f584f23e7f42c26c11739c381c8e",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:MyImageQueue",
+      "awsRegion": "us-east-1"
+    },
+    {
+      "messageId": "e1f2g3h4-5678-90ab-cdef-345678901234",
+      "receiptHandle": "AQEBwJnKyrilWSTu5tl4KkYdMEQ9tVvXh22JgWq28S2tXJzCjNfHFTf1/rY02iU/sgDfoOQ/T8eWc...",
+      "body": "{\"postId\":\"b0718c72-e479-4a0c-85e1-78b3338eeb3a\",\"imageUrl\":\"https://dl4c99ffyp7xu.cloudfront.net/posts/3e9e3816-8bbb-4e0e-ba2b-7b3a5c564461_original\"}",
+      "attributes": {
+        "ApproximateReceiveCount": "1",
+        "SentTimestamp": "1678886404000",
+        "SenderId": "AIDAIYIWI24FAD3TGYIHM",
+        "ApproximateFirstReceiveTimestamp": "1678886404000"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "0e50f584f23e7f42c26c11739c381c8f",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:123456789012:MyImageQueue",
+      "awsRegion": "us-east-1"
+    }
+  ]
+}

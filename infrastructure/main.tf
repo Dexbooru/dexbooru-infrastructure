@@ -23,6 +23,12 @@ module "build_s3_resources" {
   post_collection_picture_bucket_name = var.post_collection_picture_bucket_name
 }
 
+module "build_sqs_resources" {
+  source = "./modules/sqs"
+
+  post_images_anime_series_classificarion_queue_name = var.post_images_anime_series_classificarion_queue_name
+}
+
 module "build_iam_resources" {
   source = "./modules/iam"
 
@@ -33,9 +39,34 @@ module "build_iam_resources" {
   post_picture_bucket_arn            = module.build_s3_resources.s3_buckets["post_pictures"].arn
   post_collection_picture_bucket_arn = module.build_s3_resources.s3_buckets["collection_pictures"].arn
 
-  depends_on = [module.build_s3_resources]
+  post_anime_series_queue_arn = module.build_sqs_resources.post_anime_classification_queue_arn
+
+  depends_on = [module.build_s3_resources, module.build_sqs_resources]
 }
 
+module "build_ecr_resources" {
+  source = "./modules/ecr"
+
+  lambda_functions_ecr_repo_name = "lambda-function-images"
+}
+
+module "build_lambda_function_resources" {
+  source = "./modules/lambda"
+
+  cdn_domain_name = module.build_cloudfront_resources.distribution_domain_name
+
+  lambda_sqs_poller_iam_role_arn = module.build_iam_resources.sqs_poller_iam_role_arn
+
+  post_image_anime_series_classifier_lambda_function_name = var.post_images_anime_series_classifier_lambda_function_name
+  post_image_classification_queue_arn                     = module.build_sqs_resources.post_anime_classification_queue_arn
+
+  gemini_api_key = var.gemini_api_key
+
+  webhook_secret                      = var.webhook_secret
+  anime_series_classifier_webhook_url = var.anime_series_classifier_webhook_url
+
+  depends_on = [module.build_sqs_resources, module.build_iam_resources, module.build_cloudfront_resources, module.build_ecr_resources]
+}
 
 module "build_cloudfront_resources" {
   source = "./modules/cloudfront"
