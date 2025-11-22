@@ -1,6 +1,6 @@
 
 locals {
-  max_anime_series_classification_message_size_bytes             = 250
+  max_anime_series_classification_message_size_bytes             = 2048
   max_anime_series_classification_message_retention_time_seconds = 86400 # 1 day
   anime_series_classification_messages_delay_time_seconds        = 180   # 3 minutes
 }
