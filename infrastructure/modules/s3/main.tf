@@ -11,4 +11,8 @@ resource "aws_s3_bucket" "buckets" {
 
   bucket        = each.value
   force_destroy = true
+
+  tags = {
+    filepath = "${path.module}/main.tf"
+  }
 }

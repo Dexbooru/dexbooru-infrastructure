@@ -2,6 +2,10 @@
 resource "aws_iam_user" "dexbooru_user_webapp" {
   name          = var.dexbooru_iam_user_name
   force_destroy = true
+
+  tags = {
+    filepath = "infrastructure/modules/iam/main.tf"
+  }
 }
 
 data "aws_iam_policy_document" "dexbooru_user_webapp_document" {
@@ -83,6 +87,10 @@ resource "aws_iam_role" "sqs_poller_lambda_role" {
       },
     ],
   })
+
+  tags = {
+    filepath = "${path.module}/main.tf"
+  }
 }
 
 resource "aws_iam_role_policy_attachment" "sqs_poller_lambda_logging" {

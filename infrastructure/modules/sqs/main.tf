@@ -14,5 +14,6 @@ resource "aws_sqs_queue" "anime_series_classification_queue" {
   tags = {
     Name         = var.post_images_anime_series_classificarion_queue_name
     Descriptionn = "The SQS queue for post images anime series classification pulled by lambda function which uses Gemini LLM model"
+    filepath     = "${path.module}/main.tf"
   }
 }

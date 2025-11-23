@@ -47,7 +47,7 @@ module "build_iam_resources" {
 module "build_ecr_resources" {
   source = "./modules/ecr"
 
-  lambda_function_image_repo_names = ["lambda-function-post-source-anime-classifier"]
+  lambda_function_image_repo_names = ["lambda-function-post-image-anime-series-classifier"]
 }
 
 module "build_lambda_function_resources" {
