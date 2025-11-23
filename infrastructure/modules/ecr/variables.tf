@@ -1,5 +1,5 @@
 
-variable "lambda_functions_ecr_repo_name" {
-  type        = string
-  description = "Name of the ECR repository for Lambda functions"
+variable "lambda_function_image_repo_names" {
+  type        = list(string)
+  description = "Names of the ECR repositories for Lambda functions"
 }

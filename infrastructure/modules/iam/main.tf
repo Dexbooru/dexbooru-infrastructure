@@ -4,10 +4,6 @@ resource "aws_iam_user" "dexbooru_user_webapp" {
   force_destroy = true
 }
 
-resource "aws_iam_access_key" "dexbooru_user_webapp_access_key" {
-  user = aws_iam_user.dexbooru_user_webapp.name
-}
-
 data "aws_iam_policy_document" "dexbooru_user_webapp_document" {
   statement {
     sid    = "AllowBucketList"
@@ -55,8 +51,7 @@ data "aws_iam_policy_document" "dexbooru_user_webapp_document" {
     effect = "Allow"
 
     actions = [
-      "sqs:SendMessage",
-      "sqs:SendMessageBatch"
+      "sqs:SendMessage"
     ]
 
     resources = [
