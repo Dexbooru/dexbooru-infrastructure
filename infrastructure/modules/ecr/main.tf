@@ -1,5 +1,5 @@
 locals {
-  lambda_marker_files = fileset("../lambda/lambda_code", "**/marker.txt")
+  lambda_marker_files = fileset(abspath("${path.module}/../lambda/lambda_code"), "**/marker.txt")
   lambda_repository_names = toset([
     for marker_file in local.lambda_marker_files :
     "lambda-function-${basename(dirname(marker_file))}"
