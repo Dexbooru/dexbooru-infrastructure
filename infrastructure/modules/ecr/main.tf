@@ -1,7 +1,7 @@
 locals {
   lambda_marker_files = fileset("../lambda/lambda_code/*/marker.txt")
   lambda_directory_names = toset([
-    for marker_file in local.lambda_marker_files : dirname(marker_file)
+    for marker_file in local.lambda_marker_files : "lambda-function-${dirname(marker_file)}"
   ])
 }
 
