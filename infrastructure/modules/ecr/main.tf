@@ -1,6 +1,6 @@
 
 resource "aws_ecr_repository" "lambda_images" {
-  for_each = var.lambda_function_image_repo_names
+  for_each = set(var.lambda_function_image_repo_names)
 
   name = each.key
 
