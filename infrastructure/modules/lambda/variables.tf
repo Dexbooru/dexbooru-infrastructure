@@ -33,3 +33,11 @@ variable "webhook_secret" {
   description = "The secret for the webhook"
   type        = string
 }
+
+variable "lambda_image_ecr_details" {
+  description = "A map of ECR repository details for the Lambda function images."
+  type = map(object({
+    repository_url = string
+    image_tag      = string
+  }))
+}

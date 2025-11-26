@@ -1,0 +1,8 @@
+bruno/
+venv/
+Makefile
+*.txt
+*.json
+*.log
+*.py
+*.yml

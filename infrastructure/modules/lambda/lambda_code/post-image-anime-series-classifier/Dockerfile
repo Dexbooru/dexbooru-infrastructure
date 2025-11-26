@@ -7,7 +7,7 @@ ENV VIPS_VERSION=8.17.3
 RUN dnf update --refresh
 RUN dnf install -y --setopt=tsflags=nodocs \
     autoconf automake pkgconfig libtool meson ninja-build \
-    glib2-devel libwebp-devel libpng-devel libjpeg-turbo-devel orc-devel \
+    glib2-devel libwebp-devel orc-devel \
     gcc gcc-c++ make \
     cmake expat-devel
 
@@ -39,7 +39,7 @@ RUN GOOS=linux GOARCH=amd64 CGO_ENABLED=1 go build -tags lambda.norpc -o bootstr
 FROM --platform=$TARGETARCH public.ecr.aws/lambda/provided:al2023
 
 RUN dnf install -y \
-    glib2 libpng libjpeg-turbo libtiff lcms2 libexif orc expat
+    glib2 libwebp libexif orc expat
 
 WORKDIR ${LAMBDA_TASK_ROOT}
 

@@ -17,14 +17,17 @@ import (
 const MAX_IDLE_CONNECTIONS = 10
 const IDLE_CONNECTION_TIMEOUT = 25 * time.Second
 
-var IMAGE_MIMETYPES = "image/jpeg,image/png,image/jpg,image/webp"
-
 var logger = log.New(os.Stdout, "post-image-anime-series-classifier:", log.LstdFlags)
 
 var wg sync.WaitGroup
 
 func handler(_ context.Context, sqsEvent events.SQSEvent) error {
 	ctx := context.Background()
+
+	lambdaEnvironment, found := os.LookupEnv("ENVIRONMENT")
+	if !found {
+		lambdaEnvironment = "local"
+	}
 
 	webhookSecret, found := os.LookupEnv("WEBHOOK_SECRET")
 	if !found {
@@ -61,7 +64,7 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) error {
 		},
 	}
 
-	postImageRecords := parseRecords(sqsEvent.Records)
+	postImageRecords := parseRecordsToPostImages(sqsEvent.Records)
 	imageInputCh := make(chan ImageClassificationInput, len(postImageRecords))
 
 	for _, postImageRecord := range postImageRecords {
@@ -103,13 +106,15 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) error {
 		return nil
 	}
 
-	uploadedResults := uploadClassificationResults(classificationResults, requestClient, webhookUrl, webhookSecret)
-	if !uploadedResults {
-		logger.Println("Failed to upload classification results")
-		return errors.New("Failed to upload classification results")
-	}
+	if lambdaEnvironment == "production" {
+		uploadedResults := uploadClassificationResults(classificationResults, requestClient, webhookUrl, webhookSecret)
+		if !uploadedResults {
+			logger.Println("Failed to upload classification results")
+			return errors.New("Failed to upload classification results")
+		}
 
-	logger.Printf("%d classification results uploaded and sent to the webhook url: %s\n", len(classificationResults), webhookUrl)
+		logger.Printf("%d classification results uploaded and sent to the webhook url: %s\n", len(classificationResults), webhookUrl)
+	}
 
 	return nil
 }

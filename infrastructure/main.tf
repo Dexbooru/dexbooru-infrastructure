@@ -54,6 +54,7 @@ module "build_lambda_function_resources" {
 
   cdn_domain_name = module.build_cloudfront_resources.distribution_domain_name
 
+  lambda_image_ecr_details       = module.build_ecr_resources.lambda_ecr_repository_details
   lambda_sqs_poller_iam_role_arn = module.build_iam_resources.sqs_poller_iam_role_arn
 
   post_image_anime_series_classifier_lambda_function_name = var.post_images_anime_series_classifier_lambda_function_name

@@ -15,8 +15,9 @@ import (
 
 const RESIZED_IMAGE_WIDTH_PX = 450
 const RESIZED_IMAGE_HEIGHT_PX = 450
+const IMAGE_MIMETYPES = "image/jpeg,image/png,image/jpg,image/webp"
 
-func parseRecords(records []events.SQSMessage) []PostImageRecord {
+func parseRecordsToPostImages(records []events.SQSMessage) []PostImageRecord {
 	postImageRecords := make([]PostImageRecord, 0, len(records))
 
 	for _, message := range records {

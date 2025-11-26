@@ -60,5 +60,5 @@ func classifyImage(ctx context.Context, geminiClient *genai.Client, imageInput I
 }
 
 func classifiedResult(result ImageClassificationOutput) bool {
-	return result.SourceTitle == "Unknown" || result.SourceType == "Unknown" || result.CharacterName == "Unknown"
+	return result.SourceTitle != "Unknown" && result.SourceType != "Unknown" && result.CharacterName != "Unknown"
 }
