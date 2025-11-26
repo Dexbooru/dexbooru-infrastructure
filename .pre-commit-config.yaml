@@ -9,3 +9,10 @@ repos:
         pass_filenames: false
       - id: terraform_tflint
         pass_filenames: false
+
+  - repo: local
+    hooks:
+      - id: build-and-push-new-ecr-docker-images
+        name: Build and Push New ECR Docker Images
+        entry: ecr-scripts/build-and-push-lambda-artifacts.sh
+        language: script
