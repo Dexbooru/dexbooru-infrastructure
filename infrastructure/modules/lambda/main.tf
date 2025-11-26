@@ -14,7 +14,7 @@ resource "aws_lambda_function" "post_image_classification_lambda" {
   image_uri     = "${var.lambda_image_ecr_details["lambda-function-post-image-anime-series-classifier"].repository_url}:latest"
   package_type  = "Image"
 
-  architectures = ["amd64"]
+  architectures = ["x86_64"]
 
   image_config {
     entry_point = ["/lambda-entrypoint.sh"]
