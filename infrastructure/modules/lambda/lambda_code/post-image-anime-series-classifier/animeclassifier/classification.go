@@ -55,6 +55,7 @@ func classifyImage(ctx context.Context, geminiClient *genai.Client, imageInput I
 		return ImageClassificationOutput{}, fmt.Errorf("Could not parse classification response: %w", err)
 	}
 	classificationOutput.PostId = imageInput.PostId
+	classificationOutput.MessageId = imageInput.MessageId
 
 	return classificationOutput, nil
 }

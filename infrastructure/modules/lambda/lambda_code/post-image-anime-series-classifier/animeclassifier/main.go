@@ -21,8 +21,26 @@ var logger = log.New(os.Stdout, "post-image-anime-series-classifier:", log.LstdF
 
 var wg sync.WaitGroup
 
-func handler(_ context.Context, sqsEvent events.SQSEvent) error {
+
+func buildBatchResponse(failedMessageIds map[string]bool) SQSBatchResponse {
+	batchItemFailures := make([]SQSBatchItemFailure, 0, len(failedMessageIds))
+	for messageId := range failedMessageIds {
+		batchItemFailures = append(batchItemFailures, SQSBatchItemFailure{
+			ItemIdentifier: messageId,
+		})
+	}
+	return SQSBatchResponse{
+		BatchItemFailures: batchItemFailures,
+	}
+}
+
+func handler(_ context.Context, sqsEvent events.SQSEvent) (SQSBatchResponse, error) {
 	ctx := context.Background()
+
+	failedMessageIds := make(map[string]bool)
+	for _, record := range sqsEvent.Records {
+		failedMessageIds[record.MessageId] = true
+	}
 
 	lambdaEnvironment, found := os.LookupEnv("ENVIRONMENT")
 	if !found {
@@ -31,22 +49,22 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) error {
 
 	webhookSecret, found := os.LookupEnv("WEBHOOK_SECRET")
 	if !found {
-		logger.Fatalln("Could not find a webhook secret properly set, with the following name: WEBHOOK_SECRET")
+		return SQSBatchResponse{}, errors.New("Could not find a webhook secret properly set, with the following name: WEBHOOK_SECRET")
 	}
 
 	webhookUrl, found := os.LookupEnv("WEBHOOK_URL")
 	if !found {
-		logger.Fatalln("Could not find a webhook url properly set, with the following name: WEBHOOK_URL")
+		return SQSBatchResponse{}, errors.New("Could not find a webhook url properly set, with the following name: WEBHOOK_URL")
 	}
 
 	cdnDomainName, found := os.LookupEnv("CDN_DOMAIN_NAME")
 	if !found {
-		logger.Fatalln("Could not find a CDN domain name properly set, with the following name: CDN_DOMAIN_NAME")
+		return SQSBatchResponse{}, errors.New("Could not find a CDN domain name properly set, with the following name: CDN_DOMAIN_NAME")
 	}
 
 	geminiApiKey, found := os.LookupEnv("GEMINI_API_KEY")
 	if !found {
-		logger.Fatalln("Could not find a gemini api key properly set, with the following name: GEMINI_API_KEY")
+		return SQSBatchResponse{}, errors.New("Could not find a gemini api key properly set, with the following name: GEMINI_API_KEY")
 	}
 
 	geminiClient, err := genai.NewClient(ctx, &genai.ClientConfig{
@@ -54,7 +72,7 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) error {
 		Backend: genai.BackendGeminiAPI,
 	})
 	if err != nil {
-		logger.Fatal("Could not initialize the Gemini client successfully!")
+		return SQSBatchResponse{}, errors.New("Could not initialize the Gemini client successfully!")
 	}
 
 	requestClient := &http.Client{
@@ -98,25 +116,31 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) error {
 
 		if classifiedResult(classificationResult) {
 			classificationResults = append(classificationResults, classificationResult)
+			delete(failedMessageIds, imageInput.MessageId)
+		} else {
+			logger.Printf("Image did not meet classification criteria for URL: %s\n", imageInput.ImageUrl)
 		}
 	}
 
 	if len(classificationResults) == 0 {
 		logger.Println("No classification results for current event batch from the queue")
-		return nil
+		return buildBatchResponse(failedMessageIds), nil
 	}
 
 	if lambdaEnvironment == "production" {
 		uploadedResults := uploadClassificationResults(classificationResults, requestClient, webhookUrl, webhookSecret)
 		if !uploadedResults {
 			logger.Println("Failed to upload classification results")
-			return errors.New("Failed to upload classification results")
+			for _, result := range classificationResults {
+				failedMessageIds[result.MessageId] = true
+			}
+			return buildBatchResponse(failedMessageIds), errors.New("Failed to upload classification results")
 		}
 
 		logger.Printf("%d classification results uploaded and sent to the webhook url: %s\n", len(classificationResults), webhookUrl)
 	}
 
-	return nil
+	return buildBatchResponse(failedMessageIds), nil
 }
 
 func main() {

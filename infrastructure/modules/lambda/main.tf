@@ -1,7 +1,7 @@
 
 locals {
   memory_size_mb  = 512
-  timeout_seconds = 60
+  timeout_seconds = 120
 
   polling_message_count_size = 10
 
@@ -11,6 +11,7 @@ locals {
 
 resource "aws_lambda_function" "post_image_classification_lambda" {
   function_name = var.post_image_anime_series_classifier_lambda_function_name
+  description   = "Lambda function to classify anime series in posted images using Gemini API."
   image_uri     = "${var.lambda_image_ecr_details["lambda-function-post-image-anime-series-classifier"].repository_url}:latest"
   package_type  = "Image"
 
@@ -42,10 +43,21 @@ resource "aws_lambda_function" "post_image_classification_lambda" {
 }
 
 
+resource "aws_cloudwatch_log_group" "post_image_classification_lambda_logs" {
+  name              = "/aws/lambda/${aws_lambda_function.post_image_classification_lambda.function_name}"
+  retention_in_days = 1
+
+  tags = {
+    filepath = "${path.module}/main.tf"
+  }
+}
+
+
 resource "aws_lambda_event_source_mapping" "sqs_event_source_mapping" {
   event_source_arn = var.post_image_classification_queue_arn
   function_name    = aws_lambda_function.post_image_classification_lambda.arn
 
-  enabled    = true
-  batch_size = local.polling_message_count_size
+  enabled                 = true
+  batch_size              = local.polling_message_count_size
+  function_response_types = ["ReportBatchItemFailures"]
 }

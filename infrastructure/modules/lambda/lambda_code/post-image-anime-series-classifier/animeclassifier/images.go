@@ -30,6 +30,8 @@ func parseRecordsToPostImages(records []events.SQSMessage) []PostImageRecord {
 			continue
 		}
 
+		// Set the MessageId from SQS for tracking
+		postImageRecord.MessageId = message.MessageId
 		postImageRecords = append(postImageRecords, postImageRecord)
 	}
 
@@ -70,10 +72,11 @@ func downloadImage(client *http.Client, postImageRecord PostImageRecord, targetD
 	}
 
 	return ImageClassificationInput{
-		PostId:   postImageRecord.PostId,
-		ImageUrl: postImageRecord.ImageUrl,
-		Bytes:    resizedImage,
-		Mimetype: mimeType,
+		PostId:    postImageRecord.PostId,
+		ImageUrl:  postImageRecord.ImageUrl,
+		Bytes:     resizedImage,
+		Mimetype:  mimeType,
+		MessageId: postImageRecord.MessageId,
 	}, nil
 }
 
