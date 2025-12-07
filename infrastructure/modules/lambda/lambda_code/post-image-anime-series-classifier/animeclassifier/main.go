@@ -21,7 +21,6 @@ var logger = log.New(os.Stdout, "post-image-anime-series-classifier:", log.LstdF
 
 var wg sync.WaitGroup
 
-
 func buildBatchResponse(failedMessageIds map[string]bool) SQSBatchResponse {
 	batchItemFailures := make([]SQSBatchItemFailure, 0, len(failedMessageIds))
 	for messageId := range failedMessageIds {
@@ -128,15 +127,17 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) (SQSBatchResponse, err
 	}
 
 	if lambdaEnvironment == "production" {
-		uploadedResults := uploadClassificationResults(classificationResults, requestClient, webhookUrl, webhookSecret)
-		if !uploadedResults {
-			logger.Println("Failed to upload classification results")
+		uploadedResults, err := uploadClassificationResults(classificationResults, requestClient, webhookUrl, webhookSecret)
+		if err != nil {
+			logger.Printf("Failed to upload classification results with error: %v\n", err)
+
 			for _, result := range classificationResults {
 				failedMessageIds[result.MessageId] = true
 			}
 			return buildBatchResponse(failedMessageIds), errors.New("Failed to upload classification results")
 		}
 
+		logger.Printf("Uploaded %d records, serving post ids: %v\n", uploadedResults.RecordsAdded, uploadedResults.PostIdsServed)
 		logger.Printf("%d classification results uploaded and sent to the webhook url: %s\n", len(classificationResults), webhookUrl)
 	}
 

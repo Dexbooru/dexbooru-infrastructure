@@ -125,18 +125,29 @@ def get_lambda_folder_paths() -> List[str]:
 
 
 def run_command(
-    command: Union[str, List[str]], check_error: bool = True
+    command: Union[str, List[str]], check_error: bool = True, stream_output: bool = False
 ) -> Tuple[bool, str]:
     try:
-        result = subprocess.run(
-            command,
-            check=check_error,
-            shell=isinstance(command, str),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-        return True, result.stdout.strip()
+        if stream_output:
+            result = subprocess.run(
+                command,
+                check=check_error,
+                shell=isinstance(command, str),
+                text=True,
+            )
+        else:
+            result = subprocess.run(
+                command,
+                check=check_error,
+                shell=isinstance(command, str),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+        success = result.returncode == 0
+        if stream_output:
+            return success, ""
+        return success, result.stdout.strip()
     except subprocess.CalledProcessError as e:
         error_message = (
             f"Command failed with exit code {e.returncode}:\n"
@@ -178,7 +189,7 @@ def build_and_push_docker_image(
         build_context,
     ]
 
-    success, message = run_command(build_command, check_error=False)
+    success, message = run_command(build_command, check_error=False, stream_output=True)
     if not success:
         logging.error("Docker build failed.")
         logging.error(message)
@@ -189,7 +200,7 @@ def build_and_push_docker_image(
     logging.info("Pushing image to ECR...")
     push_command = ["docker", "push", full_image_tag]
 
-    success, message = run_command(push_command, check_error=False)
+    success, message = run_command(push_command, check_error=False, stream_output=True)
     if not success:
         logging.error("Docker push failed. Ensure you are logged into ECR.")
         logging.error(message)

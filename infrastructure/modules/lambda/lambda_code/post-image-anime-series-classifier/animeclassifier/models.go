@@ -11,7 +11,7 @@ type SQSBatchItemFailure struct {
 type PostImageRecord struct {
 	PostId    string `json:"postId"`
 	ImageUrl  string `json:"imageUrl"`
-	MessageId string // SQS Message ID for tracking failures
+	MessageId string
 }
 
 type ImageClassificationInput struct {
@@ -19,7 +19,7 @@ type ImageClassificationInput struct {
 	ImageUrl  string
 	Bytes     []byte
 	Mimetype  string
-	MessageId string // SQS Message ID for tracking
+	MessageId string
 }
 
 type ImageClassificationOutput struct {
@@ -27,5 +27,10 @@ type ImageClassificationOutput struct {
 	SourceTitle   string `json:"sourceTitle"`
 	SourceType    string `json:"sourceType"`
 	CharacterName string `json:"characterName"`
-	MessageId     string `json:"-"` // Track but don't serialize to webhook
+	MessageId     string `json:"-"`
+}
+
+type ImageClassificationWebhookApiResponse struct {
+	RecordsAdded  int      `json:"recordsAdded"`
+	PostIdsServed []string `json:"postIdsServed"`
 }
