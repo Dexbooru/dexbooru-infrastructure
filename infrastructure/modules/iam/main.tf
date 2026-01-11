@@ -40,7 +40,8 @@ data "aws_iam_policy_document" "dexbooru_user_webapp_document" {
 
     actions = [
       "s3:GetObject",
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:DeleteObject"
     ]
 
     resources = [
