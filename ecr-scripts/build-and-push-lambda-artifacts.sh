@@ -1,4 +1,5 @@
 #!/bin/bash
+set -o pipefail
 
 cd ecr-scripts
 source venv/bin/activate

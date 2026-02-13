@@ -15,7 +15,7 @@ Given an image, classify it into an source title, source type (VIDEOGAME, ANIME,
 The format is a JSON object in the following shape:
 {sourceTitle: string, sourceType: string, characterName: string}.
 If you are unsure, respond with {sourceTitle: 'Unknown', sourceType: 'Unknown', characterName: 'Unknown'}.`
-const GEMINI_MODEL_NAME = "gemini-2.0-flash"
+const GEMINI_MODEL_NAME = "gemini-2.5-flash"
 const GEMINI_MODEL_TEMPERATURE_MIN = 0.0
 const GEMINI_MODEL_TEMPERATURE_MAX = 0.2
 const GEMINI_RESPONSE_TYPE = "application/json"
