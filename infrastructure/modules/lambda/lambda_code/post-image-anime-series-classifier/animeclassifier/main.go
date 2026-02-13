@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -127,9 +128,14 @@ func handler(_ context.Context, sqsEvent events.SQSEvent) (SQSBatchResponse, err
 	}
 
 	if lambdaEnvironment == "production" {
+		classificationResultsStr, err := json.MarshalIndent(classificationResults, "", "  ")
+		if err == nil {
+			logger.Printf("got the following classification results: %s", classificationResultsStr)
+		}
+
 		uploadedResults, err := uploadClassificationResults(classificationResults, requestClient, webhookUrl, webhookSecret)
 		if err != nil {
-			logger.Printf("Failed to upload classification results with error: %v\n", err)
+			logger.Printf("Failed to upload classification results with the following error: %v\n", err)
 
 			for _, result := range classificationResults {
 				failedMessageIds[result.MessageId] = true

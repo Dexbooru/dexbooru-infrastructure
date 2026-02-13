@@ -81,10 +81,8 @@ func downloadImage(client *http.Client, postImageRecord PostImageRecord, targetD
 }
 
 func uploadClassificationResults(results []ImageClassificationOutput, client *http.Client, webhookUrl string, webhookSecret string) (*ImageClassificationWebhookApiResponse, error) {
-	requestHeaders := http.Header{
-		"Content-Type":      {"application/json"},
-		"X-WEBHOOK-API-KEY": {webhookSecret},
-	}
+	cleanedWebhookUrl := strings.TrimSpace(webhookUrl)
+
 	requestBody := struct {
 		Results []ImageClassificationOutput `json:"results"`
 	}{
@@ -96,19 +94,18 @@ func uploadClassificationResults(results []ImageClassificationOutput, client *ht
 		return nil, err
 	}
 
-	request, err := http.NewRequest(http.MethodPost, webhookUrl, bytes.NewReader(requestBodyBytes))
+	request, err := http.NewRequest(http.MethodPost, cleanedWebhookUrl, bytes.NewReader(requestBodyBytes))
 	if err != nil {
 		return nil, err
 	}
-	request.Header = requestHeaders
+
+	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("X-WEBHOOK-API-KEY", webhookSecret)
+	request.Header.Set("User-Agent", "Dexbooru-Anime-Image-Classifier-Lambda/1.0")
 
 	response, err := client.Do(request)
 	if err != nil {
 		return nil, err
-	}
-
-	if response.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("something went wrong in the webhook call from Dexbooru")
 	}
 
 	defer response.Body.Close()
@@ -117,6 +114,12 @@ func uploadClassificationResults(results []ImageClassificationOutput, client *ht
 	responseBodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
 		return nil, err
+	}
+
+	if response.StatusCode != http.StatusCreated {
+		fmt.Printf("the response body: %s\n", string(responseBodyBytes))
+
+		return nil, fmt.Errorf("something went wrong in the webhook call from Dexbooru, with a response code of %d", response.StatusCode)
 	}
 
 	err = json.Unmarshal(responseBodyBytes, &webHookResponse)
