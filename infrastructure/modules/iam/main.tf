@@ -72,6 +72,69 @@ resource "aws_iam_user_policy" "dexbooru_user_webapp_policy" {
   policy = data.aws_iam_policy_document.dexbooru_user_webapp_document.json
 }
 
+resource "aws_iam_user" "machine_learning_models" {
+  name          = var.machine_learning_models_iam_user_name
+  force_destroy = true
+
+  tags = {
+    filepath = "infrastructure/modules/iam/main.tf"
+  }
+}
+
+data "aws_iam_policy_document" "machine_learning_models_document" {
+  statement {
+    sid    = "AllowMachineLearningModelsBucketList"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      var.machine_learning_models_bucket_arn
+    ]
+  }
+
+  statement {
+    sid    = "AllowMachineLearningModelsObjectAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+
+    resources = [
+      "${var.machine_learning_models_bucket_arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "machine_learning_models_policy" {
+  name   = var.machine_learning_models_iam_user_policy_name
+  user   = aws_iam_user.machine_learning_models.name
+  policy = data.aws_iam_policy_document.machine_learning_models_document.json
+}
+
+resource "aws_iam_user" "dexbooru_ai" {
+  name          = var.dexbooru_ai_iam_user_name
+  force_destroy = true
+
+  tags = {
+    filepath = "infrastructure/modules/iam/main.tf"
+  }
+}
+
+resource "aws_iam_user_policy" "dexbooru_ai_machine_learning_models_policy" {
+  name   = var.dexbooru_ai_iam_user_policy_name
+  user   = aws_iam_user.dexbooru_ai.name
+  policy = data.aws_iam_policy_document.machine_learning_models_document.json
+}
+
+resource "aws_iam_access_key" "dexbooru_ai" {
+  user = aws_iam_user.dexbooru_ai.name
+}
 
 resource "aws_iam_role" "sqs_poller_lambda_role" {
   name = "lambda-sqs-poller-role"
