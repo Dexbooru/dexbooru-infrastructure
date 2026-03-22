@@ -21,6 +21,7 @@ module "build_s3_resources" {
   profile_picture_bucket_name         = var.profile_picture_bucket_name
   post_picture_bucket_name            = var.post_picture_bucket_name
   post_collection_picture_bucket_name = var.post_collection_picture_bucket_name
+  machine_learning_models_bucket_name = var.machine_learning_models_bucket_name
 }
 
 module "build_sqs_resources" {
@@ -40,6 +41,12 @@ module "build_iam_resources" {
   post_collection_picture_bucket_arn = module.build_s3_resources.s3_buckets["collection_pictures"].arn
 
   post_anime_series_queue_arn = module.build_sqs_resources.post_anime_classification_queue_arn
+
+  machine_learning_models_bucket_arn           = module.build_s3_resources.s3_buckets["machine_learning_models"].arn
+  machine_learning_models_iam_user_name        = var.machine_learning_models_iam_user_name
+  machine_learning_models_iam_user_policy_name = var.machine_learning_models_iam_policy_name
+  dexbooru_ai_iam_user_name                    = var.dexbooru_ai_iam_user_name
+  dexbooru_ai_iam_user_policy_name             = var.dexbooru_ai_iam_policy_name
 
   depends_on = [module.build_s3_resources, module.build_sqs_resources]
 }

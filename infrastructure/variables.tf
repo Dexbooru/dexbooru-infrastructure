@@ -20,6 +20,11 @@ variable "post_collection_picture_bucket_name" {
   description = "The S3 bucket name for storing post collection pictures"
 }
 
+variable "machine_learning_models_bucket_name" {
+  type        = string
+  description = "The S3 bucket name for storing machine learning models"
+}
+
 variable "dexbooru_webapp_iam_user_name" {
   type        = string
   description = "The IAM user name for the primary web application"
@@ -28,6 +33,26 @@ variable "dexbooru_webapp_iam_user_name" {
 variable "dexbooru_webapp_policy_name" {
   type        = string
   description = "The policy "
+}
+
+variable "machine_learning_models_iam_user_name" {
+  type        = string
+  description = "The IAM user name for machine learning model S3 access"
+}
+
+variable "machine_learning_models_iam_policy_name" {
+  type        = string
+  description = "The inline policy name for the machine learning models IAM user"
+}
+
+variable "dexbooru_ai_iam_user_name" {
+  type        = string
+  description = "The IAM user name for the dexbooru_ai microservice (machine learning models bucket)"
+}
+
+variable "dexbooru_ai_iam_policy_name" {
+  type        = string
+  description = "The inline policy name for the dexbooru_ai IAM user"
 }
 
 variable "post_images_anime_series_classificarion_queue_name" {

@@ -12,3 +12,8 @@ variable "post_collection_picture_bucket_name" {
   type        = string
   description = "The name of the S3 bucket used to store images associated with post collections."
 }
+
+variable "machine_learning_models_bucket_name" {
+  type        = string
+  description = "The name of the S3 bucket used to store machine learning models."
+}
