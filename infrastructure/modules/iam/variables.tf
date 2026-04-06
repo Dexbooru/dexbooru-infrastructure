@@ -52,3 +52,18 @@ variable "dexbooru_ai_iam_user_policy_name" {
   type        = string
   description = "The name of the inline policy attached to the dexbooru_ai IAM user."
 }
+
+variable "anime_faces_captcha_challenges_bucket_arn" {
+  type        = string
+  description = "The ARN of the S3 bucket used for storing anime faces captcha challenges."
+}
+
+variable "anime_faces_captcha_challenges_iam_user_name" {
+  type        = string
+  description = "The name of the IAM user for anime faces captcha challenges."
+}
+
+variable "anime_faces_captcha_challenges_iam_user_policy_name" {
+  type        = string
+  description = "The name of the inline policy attached to the anime faces captcha challenges IAM user."
+}

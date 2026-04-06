@@ -25,6 +25,11 @@ variable "machine_learning_models_bucket_name" {
   description = "The S3 bucket name for storing machine learning models"
 }
 
+variable "anime_faces_captcha_challenges_bucket_name" {
+  type        = string
+  description = "The S3 bucket name for storing anime faces captcha challenges"
+}
+
 variable "dexbooru_webapp_iam_user_name" {
   type        = string
   description = "The IAM user name for the primary web application"
