@@ -8,9 +8,10 @@ locals {
   whitelisted_countries_cdn = ["CA", "US"]
 
   key_map = {
-    posts              = "post_pictures"
-    collections        = "collection_pictures"
-    "profile-pictures" = "profile_pictures"
+    posts                            = "post_pictures"
+    collections                      = "collection_pictures"
+    "profile-pictures"               = "profile_pictures"
+    "anime-faces-captcha-challenges" = "anime_faces_captcha_challenges"
   }
 
   origins = {
@@ -20,9 +21,10 @@ locals {
   }
 
   path_map = {
-    "posts/*"            = "posts"
-    "collections/*"      = "collections"
-    "profile-pictures/*" = "profile-pictures"
+    "posts/*"                          = "posts"
+    "collections/*"                    = "collections"
+    "profile-pictures/*"               = "profile-pictures"
+    "anime-faces-captcha-challenges/*" = "anime-faces-captcha-challenges"
   }
 
   ordered_paths = {
