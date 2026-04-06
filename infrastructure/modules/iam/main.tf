@@ -89,6 +89,10 @@ data "aws_iam_policy_document" "anime_faces_captcha_challenges_document" {
     actions = [
       "s3:ListBucket"
     ]
+
+    resources = [
+      var.anime_faces_captcha_challenges_bucket_arn
+    ]
   }
 
   statement {
