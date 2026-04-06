@@ -54,7 +54,7 @@ jobs:
           machine_learning_models_bucket_name                      = "dexbooru-prd-machine-learning-models"
           machine_learning_models_iam_user_name                    = "dexbooru-ml-models-iam-user"
           machine_learning_models_iam_policy_name                  = "dexbooru-ml-models-policy"
-          anime_faces_captcha_challenges_bucket_arn                = "dexbooru-prd-anime-faces-captcha-challenges"
+          anime_faces_captcha_challenges_bucket_name               = "dexbooru-prd-anime-faces-captcha-challenges"
           anime_faces_captcha_challenges_iam_user_name             = "dexbooru-prd-anime-faces-captcha-challenges-iam-user"
           anime_faces_captcha_challenges_iam_policy_name           = "dexbooru-prd-anime-faces-captcha-challenges-policy"
           dexbooru_ai_iam_user_name                                = "dexbooru-ai-iam-user"

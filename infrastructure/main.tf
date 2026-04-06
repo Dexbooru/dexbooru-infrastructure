@@ -51,7 +51,7 @@ module "build_iam_resources" {
 
   anime_faces_captcha_challenges_bucket_arn           = module.build_s3_resources.s3_buckets["anime_faces_captcha_challenges"].arn
   anime_faces_captcha_challenges_iam_user_name        = var.anime_faces_captcha_challenges_iam_user_name
-  anime_faces_captcha_challenges_iam_user_policy_name = var.anime_faces_captcha_challenges_iam_user_policy_name
+  anime_faces_captcha_challenges_iam_user_policy_name = var.anime_faces_captcha_challenges_iam_policy_name
 
   depends_on = [module.build_s3_resources, module.build_sqs_resources]
 }
