@@ -30,6 +30,16 @@ variable "anime_faces_captcha_challenges_bucket_name" {
   description = "The S3 bucket name for storing anime faces captcha challenges"
 }
 
+variable "anime_faces_captcha_challenges_iam_user_name" {
+  type        = string
+  description = "The IAM user name for the anime faces captcha challenges"
+}
+
+variable "anime_faces_captcha_challenges_iam_policy_name" {
+  type        = string
+  description = "The inline policy name for the anime faces captcha challenges IAM user"
+}
+
 variable "dexbooru_webapp_iam_user_name" {
   type        = string
   description = "The IAM user name for the primary web application"
