@@ -81,6 +81,52 @@ resource "aws_iam_user" "machine_learning_models" {
   }
 }
 
+data "aws_iam_policy_document" "anime_faces_captcha_challenges_document" {
+  statement {
+    sid    = "AllowAnimeFacesCaptchaChallengesBucketList"
+    effect = "Allow"
+
+    actions = [
+      "s3:ListBucket"
+    ]
+
+    resources = [
+      var.anime_faces_captcha_challenges_bucket_arn
+    ]
+  }
+
+  statement {
+    sid    = "AllowAnimeFacesCaptchaChallengesObjectAccess"
+    effect = "Allow"
+
+    actions = [
+      "s3:GetObject",
+      "s3:PutObject",
+      "s3:DeleteObject"
+    ]
+
+    resources = [
+      "${var.anime_faces_captcha_challenges_bucket_arn}/*"
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "anime_faces_captcha_challenges_policy" {
+  name   = var.anime_faces_captcha_challenges_iam_user_policy_name
+  user   = aws_iam_user.anime_faces_captcha_challenges.name
+  policy = data.aws_iam_policy_document.anime_faces_captcha_challenges_document.json
+}
+
+resource "aws_iam_user" "anime_faces_captcha_challenges" {
+  name          = var.anime_faces_captcha_challenges_iam_user_name
+  force_destroy = true
+
+  tags = {
+    filepath = "infrastructure/modules/iam/main.tf"
+  }
+}
+
+
 data "aws_iam_policy_document" "machine_learning_models_document" {
   statement {
     sid    = "AllowMachineLearningModelsBucketList"

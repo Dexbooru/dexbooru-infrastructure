@@ -18,10 +18,11 @@ provider "aws" {
 module "build_s3_resources" {
   source = "./modules/s3"
 
-  profile_picture_bucket_name         = var.profile_picture_bucket_name
-  post_picture_bucket_name            = var.post_picture_bucket_name
-  post_collection_picture_bucket_name = var.post_collection_picture_bucket_name
-  machine_learning_models_bucket_name = var.machine_learning_models_bucket_name
+  profile_picture_bucket_name                = var.profile_picture_bucket_name
+  post_picture_bucket_name                   = var.post_picture_bucket_name
+  post_collection_picture_bucket_name        = var.post_collection_picture_bucket_name
+  machine_learning_models_bucket_name        = var.machine_learning_models_bucket_name
+  anime_faces_captcha_challenges_bucket_name = var.anime_faces_captcha_challenges_bucket_name
 }
 
 module "build_sqs_resources" {
@@ -47,6 +48,10 @@ module "build_iam_resources" {
   machine_learning_models_iam_user_policy_name = var.machine_learning_models_iam_policy_name
   dexbooru_ai_iam_user_name                    = var.dexbooru_ai_iam_user_name
   dexbooru_ai_iam_user_policy_name             = var.dexbooru_ai_iam_policy_name
+
+  anime_faces_captcha_challenges_bucket_arn           = module.build_s3_resources.s3_buckets["anime_faces_captcha_challenges"].arn
+  anime_faces_captcha_challenges_iam_user_name        = var.anime_faces_captcha_challenges_iam_user_name
+  anime_faces_captcha_challenges_iam_user_policy_name = var.anime_faces_captcha_challenges_iam_policy_name
 
   depends_on = [module.build_s3_resources, module.build_sqs_resources]
 }

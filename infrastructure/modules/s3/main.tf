@@ -1,9 +1,10 @@
 locals {
   s3_buckets = {
-    profile_pictures        = var.profile_picture_bucket_name
-    post_pictures           = var.post_picture_bucket_name
-    collection_pictures     = var.post_collection_picture_bucket_name
-    machine_learning_models = var.machine_learning_models_bucket_name
+    profile_pictures               = var.profile_picture_bucket_name
+    post_pictures                  = var.post_picture_bucket_name
+    collection_pictures            = var.post_collection_picture_bucket_name
+    machine_learning_models        = var.machine_learning_models_bucket_name
+    anime_faces_captcha_challenges = var.anime_faces_captcha_challenges_bucket_name
   }
 }
 
