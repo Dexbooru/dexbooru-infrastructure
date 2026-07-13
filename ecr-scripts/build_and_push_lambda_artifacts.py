@@ -2,6 +2,7 @@ import hashlib
 import json
 import logging
 import os
+import re
 import subprocess
 import sys
 from types import NoneType
@@ -21,6 +22,8 @@ class LambdaConfig(TypedDict):
 
 
 LAMBDA_CODE_PATH = "../infrastructure/modules/lambda/lambda_code"
+VERSION_FILENAME = "VERSION"
+SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 logging.basicConfig(
@@ -76,6 +79,9 @@ def compute_sha256_of_lambda_src(
     for package_file in package_files:
         package_filepath = os.path.join(lambda_folder_path, package_file)
         package_file_hash += compute_hash_for_file(package_filepath)
+    # Ensure version bumps trigger a rebuild/push even when source is unchanged.
+    version_filepath = os.path.join(lambda_folder_path, VERSION_FILENAME)
+    package_file_hash += compute_hash_for_file(version_filepath)
 
     return dockerfile_hash, code_hash, package_file_hash
 
@@ -124,6 +130,26 @@ def get_lambda_folder_paths() -> List[str]:
     return lambda_folder_paths
 
 
+def read_lambda_image_version(lambda_folder_path: str) -> str:
+    version_file_path = os.path.join(lambda_folder_path, VERSION_FILENAME)
+    if not os.path.exists(version_file_path):
+        raise FileNotFoundError(
+            f"Missing {VERSION_FILENAME} file at {version_file_path}. "
+            "Add a semantic version (for example: 1.0.0)."
+        )
+
+    with open(version_file_path, "r") as version_file:
+        version = version_file.read().strip()
+
+    if not SEMVER_PATTERN.match(version):
+        raise ValueError(
+            f"Invalid image version '{version}' in {version_file_path}. "
+            "Expected semantic version format like 1.2.3."
+        )
+
+    return version
+
+
 def run_command(
     command: Union[str, List[str]], check_error: bool = True, stream_output: bool = False
 ) -> Tuple[bool, str]:
@@ -165,25 +191,27 @@ def run_command(
 
 
 def build_and_push_docker_image(
-    lambda_folder_path: str, ecr_uri: str, tag: str = "latest"
+    lambda_folder_path: str, ecr_uri: str, version_tag: str
 ) -> bool:
     dockerfile_path = os.path.join(lambda_folder_path, "Dockerfile")
-    full_image_tag = f"{ecr_uri}:{tag}"
+    version_image_tag = f"{ecr_uri}:{version_tag}"
+    latest_image_tag = f"{ecr_uri}:latest"
     build_context = lambda_folder_path
 
     logging.info("--- Starting Docker Build and ECR Push Process ---")
     logging.info(f"Dockerfile Path:    {dockerfile_path}")
     logging.info(f"Build Context:      {build_context}")
     logging.info(f"ECR Repository URI: {ecr_uri}")
-    logging.info(f"Final Tag:          {full_image_tag}")
+    logging.info(f"Version Tag:        {version_image_tag}")
+    logging.info(f"Latest Tag:         {latest_image_tag}")
     logging.info("-" * 40)
 
-    logging.info(f"Building Docker image: {full_image_tag}...")
+    logging.info(f"Building Docker image: {version_image_tag}...")
     build_command = [
         "docker",
         "build",
         "-t",
-        full_image_tag,
+        version_image_tag,
         "-f",
         dockerfile_path,
         build_context,
@@ -197,18 +225,40 @@ def build_and_push_docker_image(
     logging.info("Docker image built successfully.")
     logging.info("-" * 40)
 
-    logging.info("Pushing image to ECR...")
-    push_command = ["docker", "push", full_image_tag]
-
-    success, message = run_command(push_command, check_error=False, stream_output=True)
+    logging.info("Tagging image as latest...")
+    tag_command = ["docker", "tag", version_image_tag, latest_image_tag]
+    success, message = run_command(tag_command, check_error=False, stream_output=True)
     if not success:
-        logging.error("Docker push failed. Ensure you are logged into ECR.")
+        logging.error("Docker tag for latest failed.")
         logging.error(message)
         return False
 
-    logging.info("Docker image pushed successfully.")
+    logging.info("Pushing image tags to ECR...")
+    push_version_command = ["docker", "push", version_image_tag]
+    push_latest_command = ["docker", "push", latest_image_tag]
+
+    success, message = run_command(
+        push_version_command, check_error=False, stream_output=True
+    )
+    if not success:
+        logging.error("Version tag push failed. Ensure you are logged into ECR.")
+        logging.error(message)
+        return False
+
+    success, message = run_command(
+        push_latest_command, check_error=False, stream_output=True
+    )
+    if not success:
+        logging.error("Latest tag push failed. Ensure you are logged into ECR.")
+        logging.error(message)
+        return False
+
+    logging.info("Docker image tags pushed successfully.")
     logging.info("-" * 40)
-    logging.info(f"Process Complete. Image available as: {full_image_tag}")
+    logging.info(
+        "Process Complete. Images available as: "
+        f"{version_image_tag} and {latest_image_tag}"
+    )
 
     return True
 
@@ -255,6 +305,22 @@ def main() -> None:
             logging.info(
                 f"Changes detected in {lambda_folder_path}. Building and pushing image."
             )
+            try:
+                image_version = read_lambda_image_version(lambda_folder_path)
+            except (FileNotFoundError, ValueError) as e:
+                logging.error(str(e))
+                logger.info(
+                    f"Rolling back hashes to previous values at config file at {config_filepath}"
+                )
+                write_hashes_to_file(
+                    config_filepath,
+                    lambda_config,
+                    current_dockerfile_hash or "",
+                    current_source_code_hash or "",
+                    current_package_file_hash or "",
+                )
+                continue
+
             matching_ecr_repo = get_matching_ecr_repo(
                 lambda_folder_path, remote_ecr_repos
             )
@@ -264,7 +330,7 @@ def main() -> None:
 
                 logging.info(f"Found matching ECR repository: {repo_arn}")
                 build_finished = build_and_push_docker_image(
-                    lambda_folder_path, repo_uri, "latest"
+                    lambda_folder_path, repo_uri, image_version
                 )
                 if build_finished:
                     logger.info(

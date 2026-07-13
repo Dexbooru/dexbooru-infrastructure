@@ -6,13 +6,18 @@ locals {
   polling_message_count_size = 10
 
   lambda_code_base_path = "${path.module}/lambda_code"
+  lambda_version_files  = fileset(local.lambda_code_base_path, "*/VERSION")
+  lambda_image_tags = {
+    for version_file in local.lambda_version_files :
+    "lambda-function-${basename(dirname(version_file))}" => trimspace(file("${local.lambda_code_base_path}/${version_file}"))
+  }
 }
 
 
 resource "aws_lambda_function" "post_image_classification_lambda" {
   function_name = var.post_image_anime_series_classifier_lambda_function_name
   description   = "Lambda function to classify anime series in posted images using Gemini API."
-  image_uri     = "${var.lambda_image_ecr_details["lambda-function-post-image-anime-series-classifier"].repository_url}:latest"
+  image_uri     = "${var.lambda_image_ecr_details["lambda-function-post-image-anime-series-classifier"].repository_url}:${local.lambda_image_tags["lambda-function-post-image-anime-series-classifier"]}"
   package_type  = "Image"
 
   architectures = ["x86_64"]
