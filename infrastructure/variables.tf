@@ -30,6 +30,11 @@ variable "anime_faces_captcha_challenges_bucket_name" {
   description = "The S3 bucket name for storing anime faces captcha challenges"
 }
 
+variable "upload_artifacts_bucket_name" {
+  type        = string
+  description = "The S3 bucket name for temporary raw post upload artifacts before image processing"
+}
+
 variable "anime_faces_captcha_challenges_iam_user_name" {
   type        = string
   description = "The IAM user name for the anime faces captcha challenges"

@@ -23,6 +23,11 @@ variable "post_collection_picture_bucket_arn" {
   description = "The ARN of the S3 bucket used for storing post collection pictures."
 }
 
+variable "upload_artifacts_bucket_arn" {
+  type        = string
+  description = "The ARN of the S3 bucket used for temporary raw post upload artifacts."
+}
+
 variable "post_anime_series_queue_arn" {
   type        = string
   description = "The ARN of the SQS queue used for post anime series classification."
