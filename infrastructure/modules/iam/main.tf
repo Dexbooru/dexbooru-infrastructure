@@ -30,7 +30,9 @@ data "aws_iam_policy_document" "dexbooru_user_webapp_document" {
 
     resources = [
       var.profile_picture_bucket_arn,
-      var.post_picture_bucket_arn
+      var.post_picture_bucket_arn,
+      var.post_collection_picture_bucket_arn,
+      var.upload_artifacts_bucket_arn
     ]
   }
 
@@ -47,7 +49,8 @@ data "aws_iam_policy_document" "dexbooru_user_webapp_document" {
     resources = [
       "${var.profile_picture_bucket_arn}/*",
       "${var.post_picture_bucket_arn}/*",
-      "${var.post_collection_picture_bucket_arn}/*"
+      "${var.post_collection_picture_bucket_arn}/*",
+      "${var.upload_artifacts_bucket_arn}/*"
     ]
   }
 

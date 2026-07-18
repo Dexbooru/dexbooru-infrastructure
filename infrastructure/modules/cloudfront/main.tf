@@ -33,6 +33,14 @@ locals {
   }
 
   default_origin_id = length(keys(local.origins)) > 0 ? keys(local.origins)[0] : ""
+
+  # Only CDN-facing buckets get OAI read policies (exclude private buckets like
+  # machine_learning_models and upload_artifacts).
+  cdn_bucket_keys = toset([for key in values(local.key_map) : key])
+  cdn_s3_origins = {
+    for key, bucket in var.s3_origins : key => bucket
+    if contains(local.cdn_bucket_keys, key)
+  }
 }
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
@@ -40,7 +48,7 @@ resource "aws_cloudfront_origin_access_identity" "oai" {
 }
 
 data "aws_iam_policy_document" "s3_read" {
-  for_each = var.s3_origins
+  for_each = local.cdn_s3_origins
   statement {
     actions   = ["s3:GetObject"]
     resources = ["${each.value.arn}/*"]
@@ -52,7 +60,7 @@ data "aws_iam_policy_document" "s3_read" {
 }
 
 resource "aws_s3_bucket_policy" "allow_cdn_read" {
-  for_each = var.s3_origins
+  for_each = local.cdn_s3_origins
   bucket   = each.value.id
   policy   = data.aws_iam_policy_document.s3_read[each.key].json
 }

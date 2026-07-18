@@ -23,6 +23,7 @@ module "build_s3_resources" {
   post_collection_picture_bucket_name        = var.post_collection_picture_bucket_name
   machine_learning_models_bucket_name        = var.machine_learning_models_bucket_name
   anime_faces_captcha_challenges_bucket_name = var.anime_faces_captcha_challenges_bucket_name
+  upload_artifacts_bucket_name               = var.upload_artifacts_bucket_name
 }
 
 module "build_sqs_resources" {
@@ -40,6 +41,7 @@ module "build_iam_resources" {
   profile_picture_bucket_arn         = module.build_s3_resources.s3_buckets["profile_pictures"].arn
   post_picture_bucket_arn            = module.build_s3_resources.s3_buckets["post_pictures"].arn
   post_collection_picture_bucket_arn = module.build_s3_resources.s3_buckets["collection_pictures"].arn
+  upload_artifacts_bucket_arn        = module.build_s3_resources.s3_buckets["upload_artifacts"].arn
 
   post_anime_series_queue_arn = module.build_sqs_resources.post_anime_classification_queue_arn
 
